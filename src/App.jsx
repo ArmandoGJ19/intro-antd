@@ -1,15 +1,11 @@
-import {DatePicker} from "antd";
-import {ConfigProvider} from "antd";
+
 import './App.css'
+import LayoutComponent from "./components/Layout/index.jsx";
 function App() {
 
 
     return (
-
-        <ConfigProvider theme={{token: {colorPrimary: '#7AB3E1'}}}>
-
-            <DatePicker/>
-        </ConfigProvider>
+    <LayoutComponent/>
     )
 }
 
