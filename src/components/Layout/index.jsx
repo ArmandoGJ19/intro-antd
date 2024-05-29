@@ -3,6 +3,7 @@ import {Col, Row} from "antd";
 import './LayoutComponent.css'
 
 const LayoutComponent = ({leftColSize, rightColSize, leftContent, rightContent}) => {
+    console.log('LeftColSize:', leftColSize);
     return (
         <div className="Layout-container">
             <Row>

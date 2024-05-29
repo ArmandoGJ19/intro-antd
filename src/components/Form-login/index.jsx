@@ -1,13 +1,34 @@
 
 import {Form, Input, Button, Card} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import {useNavigate} from "react-router-dom";
 import './FormLogin.css'
+import {useState} from "react";
 const Login = () => {
-    const onFinish= (values)=>{
-        console.log('Success:', values);
-    }
-    return(
+    const [loginError, setLoginError] = useState(false);
+    const navigate = useNavigate();
 
+    const user = {
+        username: 'admin',
+        password: 'admin'
+    };
+
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+        setLoginError(true);
+    };
+
+    const onFinish = (values) => {
+        const { username, password } = values;
+        if (username === user.username && password === user.password) {
+            setLoginError(false);
+            navigate('/');
+        } else {
+            setLoginError(true);
+        }
+    };
+
+    return (
         <>
             <Card
                 title="Bienvenido de nuevo"
@@ -18,21 +39,19 @@ const Login = () => {
                     name="normal-login"
                     className='login-form'
                     initialValues={{
-                        remember:true,
+                        remember: true,
                     }}
-
                     onFinish={onFinish}
-
+                    onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
                         name="username"
                         rules={[{
                             required: true,
                             message: 'Por favor ingrese su usuario'
-                        }
-                        ]}
+                        }]}
                     >
-                        <Input prefix = {<UserOutlined/>} placeholder='Usuario'/>
+                        <Input prefix={<UserOutlined />} placeholder='Usuario' />
                     </Form.Item>
 
                     <Form.Item
@@ -40,22 +59,23 @@ const Login = () => {
                         rules={[{
                             required: true,
                             message: 'Por favor ingrese su contraseña'
-                        }
-                        ]}
+                        }]}
                     >
-                        <Input.Password prefix = {<LockOutlined/>} placeholder='Password'/>
+                        <Input.Password prefix={<LockOutlined />} placeholder='Contraseña' />
                     </Form.Item>
+
+                    {loginError && <div className="login-error">Usuario o contraseña incorrectos</div>}
+
                     <Form.Item>
-                        <Button type='primary' htmlType='submit' className='login-form-buttton'>
+                        <Button type='primary' htmlType='submit' className='login-form-button'>
                             Iniciar Sesión
                         </Button>
                     </Form.Item>
-                    ¿Aún no tienes cuenta? <a href=''>Registrate</a>
+                    ¿Aún no tienes cuenta? <a href=''>Regístrate</a>
                 </Form>
-
             </Card>
         </>
-    )
-}
+    );
+};
 
-export default Login
+export default Login;
