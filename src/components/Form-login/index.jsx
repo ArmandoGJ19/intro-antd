@@ -71,7 +71,7 @@ const Login = () => {
                             Iniciar Sesión
                         </Button>
                     </Form.Item>
-                    ¿Aún no tienes cuenta? <a href=''>Regístrate</a>
+                    ¿Aún no tienes cuenta? <a href='/register'>Regístrate</a>
                 </Form>
             </Card>
         </>
