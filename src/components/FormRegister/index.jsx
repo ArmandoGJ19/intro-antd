@@ -1,21 +1,61 @@
 import React, { useState } from 'react';
 import { Button, Form, Input, Card } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import './register.css';
 import axios from "axios";
+import { notification } from 'antd';
+
 // import routes from '/src/components/routes.js';
 
 const FormRegister = () => {
 
     const [registerError, setRegisterError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-
+    const navigate = useNavigate();
     // Función para mostrar los errores en el formulario
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
         setRegisterError(true);
     };
-
+    const openNotification = () => {
+        notification.success({
+            message: 'Registro exitoso',
+            description: 'El usuario ha sido registrado correctamente.',
+            placement: 'topRight',
+        });
+    };
+    const registerUser = (values) => {
+        // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTk3MzllMWM2MTc0MjcyZDY1NDUwYSIsIm5hbWUiOiJBbmEgU29sIiwibGFzdG5hbWUiOiJBcnRlYWdhIFJpdmVyYSIsImlhdCI6MTcxNzA4NTEzOSwiZXhwIjoxNzE3MTcxNTM5fQ.je8xRRuMcWZ5_uK-9phob8HwkR7IAryg2fRZR1tyKFY'
+        axios.post('https://evaluacion-2.vercel.app/api/users/', {
+            name: values.name,
+            password: values.password,
+            email: values.email,
+            lastname: values.lastname,
+            roles: ['servicios_escolares']
+        }, {
+            headers: {
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTk3NDMzMWM2MTc0MjcyZDY1NDUwZiIsIm5hbWUiOiJrYXJsYSBlcmlrYSIsImxhc3RuYW1lIjoicm9ibGVzIHZhcmdhcyIsImlhdCI6MTcxNzA4ODU3NCwiZXhwIjoxNzE3MTc0OTc0fQ.akzuDK4u3Kc-FZO1uMmQmzmk5a1MxMZWq6BbbVDLa3o'
+            }
+        })
+            .then((response) => {
+                console.log(response);
+                openNotification();
+                setIsLoading(false);
+                setTimeout(
+                    () => {
+                        navigate('/Login');
+                    },
+                    2000
+                )
+                // navigate('/Login');
+            })
+            .catch((error) => {
+                console.log(error);
+                setRegisterError(true);
+                setIsLoading(false);
+            });
+    }
     // Función para validar el usuario y contraseña
     const onFinish = (values) => {
         console.log('Success:', values);
@@ -31,31 +71,6 @@ const FormRegister = () => {
             return Promise.reject(new Error('Las contraseñas no coinciden.'));
         },
     });
-
-    const registerUser = (values) => {
-        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTk3NDMzMWM2MTc0MjcyZDY1NDUwZiIsIm5hbWUiOiJrYXJsYSBlcmlrYSIsImxhc3RuYW1lIjoicm9ibGVzIHZhcmdhcyIsImlhdCI6MTcxNzAzOTc3OCwiZXhwIjoxNzE3MTI2MTc4fQ.0aUZvLOZPBDi_S2rKIfZADl2AcisWr1nn0r9KrU_CVI'
-        axios.post('https://evaluacion-2.vercel.app/api/users/', {
-            name: values.name,
-            password: values.password,
-            email: values.email,
-            lastname: values.lastname
-        }, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-            .then((response) => {
-                console.log(response);
-                setIsLoading(false);
-                // Aquí puedes añadir cualquier acción adicional en caso de éxito,
-                // como redirigir al usuario a la página de inicio de sesión.
-            })
-            .catch((error) => {
-                console.log(error);
-                setRegisterError(true);
-                setIsLoading(false);
-            });
-    }
 
     return (
         <Card

@@ -6,7 +6,7 @@ import FormRegister from "../../components/FormRegister/index.jsx";
 // import FormLogin from "../../components/Form-login/index.jsx";
 
 const Register = () => {
-    console.log(Imagen);
+    // console.log(Imagen);
     return (
         <LayoutComponent
             leftColSize={{xs:24, sm:12, md:16, lg:18}}
