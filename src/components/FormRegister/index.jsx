@@ -3,9 +3,10 @@ import { Button, Form, Input, Card } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import './register.css';
-import axios from "axios";
+// import axios from "axios";
 import { notification } from 'antd';
-
+import authService from "../../services/auth.js";
+import {validatePassword} from "../../utils/validations.js";
 // import routes from '/src/components/routes.js';
 
 const FormRegister = () => {
@@ -25,20 +26,11 @@ const FormRegister = () => {
             placement: 'topRight',
         });
     };
-    const registerUser = (values) => {
-        // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTk3MzllMWM2MTc0MjcyZDY1NDUwYSIsIm5hbWUiOiJBbmEgU29sIiwibGFzdG5hbWUiOiJBcnRlYWdhIFJpdmVyYSIsImlhdCI6MTcxNzA4NTEzOSwiZXhwIjoxNzE3MTcxNTM5fQ.je8xRRuMcWZ5_uK-9phob8HwkR7IAryg2fRZR1tyKFY'
-        axios.post('https://evaluacion-2.vercel.app/api/users/', {
-            name: values.name,
-            password: values.password,
-            email: values.email,
-            lastname: values.lastname,
-            roles: ['servicios_escolares']
-        }, {
-            headers: {
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTk3NDMzMWM2MTc0MjcyZDY1NDUwZiIsIm5hbWUiOiJrYXJsYSBlcmlrYSIsImxhc3RuYW1lIjoicm9ibGVzIHZhcmdhcyIsImlhdCI6MTcxNzA4ODU3NCwiZXhwIjoxNzE3MTc0OTc0fQ.akzuDK4u3Kc-FZO1uMmQmzmk5a1MxMZWq6BbbVDLa3o'
-            }
-        })
-            .then((response) => {
+    const registerUser =async (values) => {
+
+        try {
+            const response =await authService.register(values.name, values.password, values.email, values.lastname);
+            if (response && response.data) {
                 console.log(response);
                 openNotification();
                 setIsLoading(false);
@@ -47,14 +39,17 @@ const FormRegister = () => {
                         navigate('/Login');
                     },
                     2000
-                )
-                // navigate('/Login');
-            })
-            .catch((error) => {
-                console.log(error);
+                );
+            }else {
+                console.error("Error en el registro, respuesta inesperada");
                 setRegisterError(true);
-                setIsLoading(false);
-            });
+            }
+        }catch (error) {
+            console.error('Error during login:', error);
+            console.log(error);
+            setRegisterError(true);
+            setIsLoading(false);
+        }
     }
     // Función para validar el usuario y contraseña
     const onFinish = (values) => {
@@ -62,15 +57,6 @@ const FormRegister = () => {
         setIsLoading(true);
         registerUser(values);
     };
-
-    const validatePassword = ({ getFieldValue }) => ({
-        validator(_, value) {
-            if (!value || getFieldValue('password') === value) {
-                return Promise.resolve();
-            }
-            return Promise.reject(new Error('Las contraseñas no coinciden.'));
-        },
-    });
 
     return (
         <Card

@@ -1,30 +1,49 @@
-
-import {Form, Input, Button, Card} from 'antd';
+import { Form, Input, Button, Card, notification } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import {useNavigate} from "react-router-dom";
-import './FormLogin.css'
-import {useState} from "react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import './FormLogin.css';
+import authService from '/src/services/auth';
+import {useAuth} from '/src/hooks/useAuth';
 const Login = () => {
     const [loginError, setLoginError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-
-    const user = {
-        username: 'admin',
-        password: 'admin'
-    };
-
+    const useAuthData = useAuth();
+    console.log(useAuthData);
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
         setLoginError(true);
     };
 
-    const onFinish = (values) => {
-        const { username, password } = values;
-        if (username === user.username && password === user.password) {
-            setLoginError(false);
-            navigate('/');
-        } else {
+    const onFinish = async (values) => {
+        setIsLoading(true);
+        try {
+            const response =await authService.loginF(values.email, values.password);
+            if (response && response.data) {
+                console.log('Login successful:', response.data);
+                setIsLoading(false);
+                setLoginError(false);
+                // Almacena el token en el localStorage o en el contexto de la aplicación
+                localStorage.setItem('token', response.data.token);
+                notification.success({
+                    message: 'Inicio de sesión exitoso',
+                    description: 'Bienvenido de nuevo.',
+                    placement: 'topRight',
+                });
+
+                navigate('/'); // Redirige a la página de inicio
+            }else {
+                // console.log(response.data);
+                console.error("Error en el inicio de sesión, respuesta inesperada");
+                setLoginError(true);
+            }
+        }catch (error) {
+            console.error('Error during login:', error);
+            setIsLoading(false);
             setLoginError(true);
+        }finally {
+            setIsLoading(false);
         }
     };
 
@@ -45,13 +64,13 @@ const Login = () => {
                     onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
-                        name="username"
+                        name="email"
                         rules={[{
                             required: true,
-                            message: 'Por favor ingrese su usuario'
+                            message: 'Por favor ingrese su email'
                         }]}
                     >
-                        <Input prefix={<UserOutlined />} placeholder='Usuario' />
+                        <Input prefix={<UserOutlined />} placeholder='Email' />
                     </Form.Item>
 
                     <Form.Item
@@ -67,7 +86,7 @@ const Login = () => {
                     {loginError && <div className="login-error">Usuario o contraseña incorrectos</div>}
 
                     <Form.Item>
-                        <Button type='primary' htmlType='submit' className='login-form-button'>
+                        <Button type='primary' htmlType='submit' className='login-form-button' loading={isLoading}>
                             Iniciar Sesión
                         </Button>
                     </Form.Item>
