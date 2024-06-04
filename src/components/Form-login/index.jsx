@@ -1,17 +1,14 @@
-
-import {Form, Input, Button, Card} from 'antd';
+import { Form, Input, Button, Card, notification } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import {useNavigate} from "react-router-dom";
-import './FormLogin.css'
-import {useState} from "react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from 'axios';
+import './FormLogin.css';
+
 const Login = () => {
     const [loginError, setLoginError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-
-    const user = {
-        username: 'admin',
-        password: 'admin'
-    };
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
@@ -19,13 +16,31 @@ const Login = () => {
     };
 
     const onFinish = (values) => {
-        const { username, password } = values;
-        if (username === user.username && password === user.password) {
-            setLoginError(false);
-            navigate('/');
-        } else {
-            setLoginError(true);
-        }
+        const { email, password } = values;
+        setIsLoading(true);
+
+        axios.post('https://evaluacion-2.vercel.app/api/auth/signin', {
+            email: email,
+            password: password
+        })
+            .then((response) => {
+                console.log('Login successful:', response.data);
+                setIsLoading(false);
+                setLoginError(false);
+                // Almacena el token en el localStorage o en el contexto de la aplicación
+                localStorage.setItem('token', response.data.token);
+                notification.success({
+                    message: 'Inicio de sesión exitoso',
+                    description: 'Bienvenido de nuevo.',
+                    placement: 'topRight',
+                });
+                navigate('/'); // Redirige a la página de inicio
+            })
+            .catch((error) => {
+                console.error('Error during login:', error.response ? error.response.data : error.message);
+                setIsLoading(false);
+                setLoginError(true);
+            });
     };
 
     return (
@@ -45,13 +60,13 @@ const Login = () => {
                     onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
-                        name="username"
+                        name="email"
                         rules={[{
                             required: true,
-                            message: 'Por favor ingrese su usuario'
+                            message: 'Por favor ingrese su email'
                         }]}
                     >
-                        <Input prefix={<UserOutlined />} placeholder='Usuario' />
+                        <Input prefix={<UserOutlined />} placeholder='Email' />
                     </Form.Item>
 
                     <Form.Item
@@ -67,7 +82,7 @@ const Login = () => {
                     {loginError && <div className="login-error">Usuario o contraseña incorrectos</div>}
 
                     <Form.Item>
-                        <Button type='primary' htmlType='submit' className='login-form-button'>
+                        <Button type='primary' htmlType='submit' className='login-form-button' loading={isLoading}>
                             Iniciar Sesión
                         </Button>
                     </Form.Item>

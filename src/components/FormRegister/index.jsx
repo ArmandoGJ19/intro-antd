@@ -35,7 +35,7 @@ const FormRegister = () => {
             roles: ['servicios_escolares']
         }, {
             headers: {
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTk3NDMzMWM2MTc0MjcyZDY1NDUwZiIsIm5hbWUiOiJrYXJsYSBlcmlrYSIsImxhc3RuYW1lIjoicm9ibGVzIHZhcmdhcyIsImlhdCI6MTcxNzA4ODU3NCwiZXhwIjoxNzE3MTc0OTc0fQ.akzuDK4u3Kc-FZO1uMmQmzmk5a1MxMZWq6BbbVDLa3o'
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTk3NDMzMWM2MTc0MjcyZDY1NDUwZiIsIm5hbWUiOiJrYXJsYSBlcmlrYSIsImxhc3RuYW1lIjoicm9ibGVzIHZhcmdhcyIsImlhdCI6MTcxNzQ2NzQzMSwiZXhwIjoxNzE3NTUzODMxfQ._HmCBRlTZJ5--Ae-KZdd2URGzblsbD6endYKpPSC53M'
             }
         })
             .then((response) => {
