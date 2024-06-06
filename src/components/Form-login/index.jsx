@@ -2,45 +2,51 @@ import { Form, Input, Button, Card, notification } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from 'axios';
 import './FormLogin.css';
+import authService from '/src/services/auth';
+import { useAuth } from '/src/hooks/useAuth';
 
 const Login = () => {
     const [loginError, setLoginError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const useAuthData = useAuth();
+    const { login } = useAuthData;
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
         setLoginError(true);
     };
 
-    const onFinish = (values) => {
-        const { email, password } = values;
+    const onFinish = async (values) => {
         setIsLoading(true);
-
-        axios.post('https://evaluacion-2.vercel.app/api/auth/signin', {
-            email: email,
-            password: password
-        })
-            .then((response) => {
+        try {
+            const response = await authService.loginF(values.email, values.password);
+            if (response && response.data) {
                 console.log('Login successful:', response.data);
                 setIsLoading(false);
                 setLoginError(false);
                 // Almacena el token en el localStorage o en el contexto de la aplicación
                 localStorage.setItem('token', response.data.token);
+                login(response.data.token);
                 notification.success({
                     message: 'Inicio de sesión exitoso',
                     description: 'Bienvenido de nuevo.',
                     placement: 'topRight',
                 });
+
                 navigate('/'); // Redirige a la página de inicio
-            })
-            .catch((error) => {
-                console.error('Error during login:', error.response ? error.response.data : error.message);
-                setIsLoading(false);
+            } else {
+                console.error("Error en el inicio de sesión, respuesta inesperada");
                 setLoginError(true);
-            });
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            setIsLoading(false);
+            setLoginError(true);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
