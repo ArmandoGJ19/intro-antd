@@ -5,12 +5,14 @@ import { useState } from "react";
 import './FormLogin.css';
 import authService from '/src/services/auth';
 import {useAuth} from '/src/hooks/useAuth';
+
 const Login = () => {
     const [loginError, setLoginError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const useAuthData = useAuth();
-    console.log(useAuthData);
+    const {login} = useAuthData;
+
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
         setLoginError(true);
@@ -26,6 +28,7 @@ const Login = () => {
                 setLoginError(false);
                 // Almacena el token en el localStorage o en el contexto de la aplicación
                 localStorage.setItem('token', response.data.token);
+                login(response.data.token);
                 notification.success({
                     message: 'Inicio de sesión exitoso',
                     description: 'Bienvenido de nuevo.',
